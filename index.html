@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>みん教ガチャ｜みんなの教育技術の記事をランダムに</title>
+<meta name="description" content="小学館「みんなの教育技術」の最新記事をガチャでランダムに表示するアプリ。日々更新。" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="app-header">
+  <h1>🎰 みん教ガチャ</h1>
+  <nav class="screen-nav">
+    <button class="nav-btn active" data-screen="gacha">ガチャ</button>
+    <button class="nav-btn" data-screen="collection">読んだ記事</button>
+    <button class="nav-btn" data-screen="info">情報</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ===== ガチャ画面 ===== -->
+  <section id="screen-gacha" class="screen active">
+    <div class="gacha-stage">
+      <div class="machine">
+        <!-- 赤い天板 -->
+        <div class="part part-cap">
+          <div class="face face-front"></div>
+          <div class="face face-top"></div>
+          <div class="face face-right"></div>
+          <div class="cap-screw"></div>
+        </div>
+        <!-- ガラスキューブ -->
+        <div class="part part-cube">
+          <div class="face face-front glass-face">
+            <div class="glass-shine"></div>
+          </div>
+          <div class="face face-right glass-face">
+            <div class="glass-shine right"></div>
+          </div>
+          <div class="face face-back glass-back"></div>
+          <div class="face face-bottom cube-floor"></div>
+          <div class="capsules-stack" id="dome-inner"></div>
+          <div class="cube-frame fr-tl"></div>
+          <div class="cube-frame fr-tr"></div>
+          <div class="cube-frame fr-bl"></div>
+          <div class="cube-frame fr-br"></div>
+        </div>
+        <!-- 中段（つまみ） -->
+        <div class="part part-mid">
+          <div class="face face-front">
+            <div class="brand-label">みんなの教育技術</div>
+            <div class="knob-housing">
+              <div class="knob" id="lever">
+                <div class="knob-bar h"></div>
+                <div class="knob-center"></div>
+              </div>
+            </div>
+          </div>
+          <div class="face face-top"></div>
+          <div class="face face-right"></div>
+        </div>
+        <!-- 下段（取り出し口） -->
+        <div class="part part-bottom">
+          <div class="face face-front">
+            <div class="output-cavity"></div>
+            <div class="output-door" id="output-door">
+              <div class="door-keyhole"></div>
+              <div class="door-arrow"></div>
+            </div>
+          </div>
+          <div class="face face-right"></div>
+          <div class="face face-bottom"></div>
+        </div>
+      </div>
+      <div class="capsule-fly" id="capsule-fly" hidden>
+        <div class="capsule-bottom"></div>
+        <div class="capsule-top"></div>
+      </div>
+    </div>
+
+    <div class="gacha-controls">
+      <label class="checkbox-row">
+        <input type="checkbox" id="allow-duplicate" />
+        <span>既読も含めて回す</span>
+      </label>
+      <button class="big-btn pull-btn" id="pull-btn">ガチャを回す！</button>
+      <div class="gacha-meta" id="gacha-meta"></div>
+    </div>
+  </section>
+
+  <!-- ===== 読んだ記事画面 ===== -->
+  <section id="screen-collection" class="screen">
+    <div class="collection-header">
+      <h2>📚 読んだ記事</h2>
+      <div class="collection-meta">
+        <span id="collection-count">0 / 0</span>
+        <button class="ghost-btn" id="reset-collection-btn">リセット</button>
+      </div>
+    </div>
+    <div class="collection-grid" id="collection-grid"></div>
+  </section>
+
+  <!-- ===== 情報画面 ===== -->
+  <section id="screen-info" class="screen">
+    <div class="info-card">
+      <h2>このアプリについて</h2>
+      <p>
+        小学館
+        <a href="https://kyoiku.sho.jp/" target="_blank" rel="noopener">みんなの教育技術</a>
+        の記事をガチャでランダムに表示する非公式アプリです。<br />
+        記事は1日1回，自動で最新の状態に更新されます。
+      </p>
+      <dl class="info-list">
+        <dt>記事の収録数</dt>
+        <dd><span id="info-count">―</span> 件</dd>
+        <dt>記事リストの最終更新</dt>
+        <dd><span id="info-updated">―</span></dd>
+        <dt>データの取得元</dt>
+        <dd>kyoiku.sho.jp の RSS</dd>
+      </dl>
+      <p class="info-note">
+        ガチャの履歴・読んだ記事はこの端末のブラウザに保存されます（他の人に送信されません）。
+      </p>
+      <p class="info-note small">
+        ※ 本アプリは「みんなの教育技術」公式のものではありません。
+        記事の著作権はすべて発行元に帰属します。
+      </p>
+    </div>
+  </section>
+</main>
+
+<!-- ===== 結果モーダル ===== -->
+<div id="result-modal" class="modal hidden" aria-hidden="true">
+  <div class="result-stage" id="result-stage">
+    <div class="big-capsule" id="big-capsule">
+      <div class="big-capsule-top"></div>
+      <div class="big-capsule-bottom"></div>
+    </div>
+    <div class="result-content" id="result-content" hidden>
+      <div class="result-bond" id="result-bond"></div>
+      <div class="result-name" id="result-name"></div>
+      <div class="result-rule" id="result-rule"></div>
+      <div class="result-actions">
+        <a class="primary-btn" id="result-open-btn" href="#" target="_blank" rel="noopener">📖 記事を読む</a>
+        <button class="ghost-btn" id="result-redraw-btn">もう一回</button>
+        <button class="ghost-btn" id="result-close-btn">とじる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 確認モーダル ===== -->
+<div id="confirm-modal" class="modal hidden" aria-hidden="true">
+  <div class="modal-card small">
+    <h3 id="confirm-title">確認</h3>
+    <p id="confirm-message"></p>
+    <div class="modal-actions">
+      <button class="ghost-btn" id="confirm-cancel-btn">キャンセル</button>
+      <button class="primary-btn" id="confirm-ok-btn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
